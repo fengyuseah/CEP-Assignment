@@ -1,0 +1,37 @@
+{% load staticfiles %}
+<link rel = "stylesheet" type = "text/css" href = "{% static 'todos/style.css' %}" />
+<div class="wrap">
+  	<div class="header"><span>{{todo.task}}</span></div>
+	<div class="wrap-list">
+		<ol class="list">
+			<li>
+				<input type="checkbox" id={{todo.id}}>
+				<label for={{todo.id}}><b>Task:</b> {{todo.task}} &nbsp; &nbsp; &nbsp; <font color='red'>{{todo.priority}}</font></label>
+			</li>
+			{% if todo.description %}
+			<li>
+				<label><b>Description:</b> {{todo.description}}</label>
+			</li>
+			{% endif %}
+			{% if todo.due_date %}
+			<li>
+				<label><b>Due Date:</b> {{todo.due_date|date:"l j N Y P"}}</label>
+			</li>
+			{% endif %}
+			{% if todo.tag %}
+			<li>
+				<label>
+					<b>Tag(s):</b>
+					{% for tags in todo.tag.all %}
+					<a href={% url 'tag_list' tags %}>
+						<div class='tag'>
+							{{tags.name}}
+						</div>
+					</a>
+					{% endfor %}
+				</label>
+			</li>
+			{% endif %}
+		</ol>
+	</div>
+</div>
