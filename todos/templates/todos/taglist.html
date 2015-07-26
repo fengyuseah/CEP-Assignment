@@ -1,11 +1,11 @@
 {% load staticfiles %}
 <link rel = "stylesheet" type = "text/css" href = "{% static 'todos/style.css' %}" />
 <div class="wrap">
-  	<div class="header"><span>{{tag}}</span></div>
+  	<div class="header"><span>&nbsp; &nbsp;{{tag}}</span></div>
 	<div class="wrap-list">
 		<ol class="list">
-			{% if todos %}
-			{% for todo in todos %}
+			{% if object_list %}
+			{% for todo in object_list %}
 			<li>
 				<input type="checkbox" id={{todo.id}}>
 				<label for={{todo.id}}>

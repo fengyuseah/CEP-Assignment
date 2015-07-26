@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <link rel = "stylesheet" type = "text/css" href = "{% static 'todos/style.css' %}" />
 <div class="wrap">
-  	<div class="header"><span>{{todo.task}}</span></div>
+  	<div class="header"><span>&nbsp; &nbsp;{{todo.task}}</span><a href={% url 'todo_delete' todo.id %} class="myButton" id='delete'>x</a></div>
 	<div class="wrap-list">
 		<ol class="list">
 			<li>
@@ -30,6 +30,9 @@
 					</a>
 					{% endfor %}
 				</label>
+			</li>
+			<li>
+				<label><b><a href={% url 'todo_update' todo.id %} id='editlink'>EDIT NOTE</b></a></label>
 			</li>
 			{% endif %}
 		</ol>

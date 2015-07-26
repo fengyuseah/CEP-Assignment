@@ -1,6 +1,7 @@
 from django.db import models
 import datetime
 from django.utils import timezone
+from django.core.urlresolvers import reverse
 
 # Create your models here.
 class Todo(models.Model):
@@ -17,6 +18,9 @@ class Todo(models.Model):
         
     def is_due_today(self):
         return self.due_date < timezone.now()
+    
+    def get_absolute_url(self):
+        return reverse("todos_detail", kwargs={"pk":self.pk})
         
 class Tag(models.Model):
     name = models.CharField(max_length=255)
