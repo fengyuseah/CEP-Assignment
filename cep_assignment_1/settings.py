@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'todos',
     'bootstrap3',
     'crispy_forms',
+    'accounts',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -87,3 +88,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+LOGIN_URL = '/accounts/login'
+LOGIN_REDIRECT_URL = '/todos/'

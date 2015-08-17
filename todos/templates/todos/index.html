@@ -1,5 +1,43 @@
 {% load staticfiles %}
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery=1%}
 <link rel = "stylesheet" type = "text/css" href = "{% static 'todos/style.css' %}" />
+<script type="text/css">
+.mynavbar {
+    display:block;
+    margin:0px;
+    padding:0px;
+    height:50px;
+    align:top;
+}
+
+</script>
+<div class="mynavbar">
+  <ul class="nav nav-tabs navbar-right">
+    <li role="presentation" class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">
+        {%if user.is_authenticated%}
+        <img src="/media/{{currentuser.picture}}" height="30px" %} />
+        Hi {{user.username}}!
+        {%else%}
+        Login here!
+        {%endif%}
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu">
+        {%if user.is_authenticated%}
+        <li><a href="/accounts/logout">Logout</a></li>
+        <li><a href="/add">Add a todo</a></li>
+        <li><a href="/todos">View all my todos</a></li>
+        {%else%}
+        <li><a href="/accounts/login">Login</a></li>
+        <li><a href="/accounts/register">Register</a></li>
+        {%endif%}
+      </ul>
+    </li>
+  </ul>
+</div>
 <div class="wrap">
   	<div class="header"><span>&nbsp; &nbsp;Todo List</span><a href={% url 'todo_add' %} class="myButton" id='add'>+</a></div>
 	<div class="wrap-list">

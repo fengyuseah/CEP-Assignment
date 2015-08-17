@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from .models import Todo
 from django.http import HttpResponse
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.db.models import Q
 from todos.forms import TodoForm
 from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from accounts.models import UserProfile
 
 # Create your views here.
 '''
@@ -25,11 +28,38 @@ def tag_list(request, tag):
     return render(request, 'todos/taglist.html', {'todos' : tag_todos, 'tag' : tag})
 '''
 
+class TodoList(ListView):
+    model = Todo
+    
+    queryset = Todo.objects.all()
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(TodoList, self).dispatch(*args, **kwargs)
+    
+    def get_queryset(self):
+        currentuser = UserProfile.objects.get(user=self.request.user)
+        todos = Todo.objects.filter(user=currentuser)
+        self.queryset = todos
+        return todos
+
+    def get_context_data(self, **kwargs):
+        context = super(TodoList, self).get_context_data(**kwargs)
+        context['currentuser'] = UserProfile.objects.get(user=self.request.user)
+        return context
+
 class TagList(ListView):
     model = Todo
     
     queryset = Todo.objects.all()
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(TagList, self).dispatch(*args, **kwargs)
+    
+    #@method_decorator(login_required)
     def get_queryset(self):
+        currentuser = UserProfile.objects.get(user=self.request.user)
         tagn = self.kwargs['tag']
         #pieces = tags.split('/') #extract different tags separated by /
         
@@ -41,18 +71,40 @@ class TagList(ListView):
         #for item in queries:
         #query |= item
         # Query the model
-        todos = Todo.objects.filter(query).distinct().order_by('tag__name')
+        todos = Todo.objects.filter(user=currentuser).filter(query).distinct().order_by('tag__name')
         self.queryset = todos #Setting the queryset to allow get_context_data to apply count
         return todos
-        
+    
+    #@method_decorator(login_required)
     def get_context_data(self, **kwargs):
         context = super(TagList, self).get_context_data(**kwargs)
         context['tag'] = self.kwargs['tag']
+        context['currentuser'] = UserProfile.objects.get(user=self.request.user)
         return context
         
 class TodoCreate(CreateView):
     model = Todo
-    form_class = TodoForm
+    todo_form_class = TodoForm
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(TodoCreate, self).dispatch(*args, **kwargs)
+        
+    def get(self, request, *args, **kwargs):
+        kwargs.setdefault("createtodo_form", self.todo_form_class())
+        kwargs.setdefault('currentuser', UserProfile.objects.get(user=self.request.user))
+        return super(TodoCreate, self).get(request, *args, **kwargs)
+        
+    def post(self, request, *args, **kwargs):
+        form_args = {
+            'data': self.request.POST,
+        }
+        form = self.todo_form_class(**form_args)
+        curruser = UserProfile.objects.get(user=self.request.user)
+        obj = form.save(commit=False)
+        obj.user = curruser #Save the note note under that user
+        obj.save() #save the new object
+        return super(TodoCreate, self).get(request)
     
 class TodoUpdate(UpdateView):
     model = Todo
@@ -64,3 +116,6 @@ class TodoDetail(DetailView):
 class TodoDelete(DeleteView):
     model = Todo
     success_url = reverse_lazy('todo_list')
+
+class Landing(TemplateView):
+    template_name = "todos/landing.html"

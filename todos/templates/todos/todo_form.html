@@ -1,11 +1,18 @@
 {%extends 'todos/base.html'%}
 {% load crispy_forms_tags %}
+{%block title%}
+{%if object%}
+Update
+{%else%}
+New
+{%endif%}
+{%endblock%}
 {%block content%}
 <div class="container">
     <div class="row">
         <div class="col-md-6">
     {%if object%}
-        <h1>Update {{object.title}}</h1>
+        <h1>Update "{{object.task}}"</h1>
     {%else%}
         <h1>Create a New Todo</h1>
     {%endif%}

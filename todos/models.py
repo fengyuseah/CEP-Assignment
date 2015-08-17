@@ -2,11 +2,13 @@ from django.db import models
 import datetime
 from django.utils import timezone
 from django.core.urlresolvers import reverse
+from accounts.models import UserProfile
 
 # Create your models here.
 class Todo(models.Model):
     priority_list = (('!!!', 'HIGH'), ('!!', 'MEDIUM'), ('!', 'LOW'), (' ', '------'))
     
+    user = models.ForeignKey(UserProfile, blank=True, null=True)
     task = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     priority = models.CharField(max_length=3, choices=priority_list, default=' ')
