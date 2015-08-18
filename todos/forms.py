@@ -8,6 +8,8 @@ class TodoForm(forms.ModelForm):
         model = Todo
         fields = ('task','description','priority','due_date', 'tag')
     
-    helper = FormHelper()
-    helper.form_method = 'POST'
-    helper.add_input(Submit('Save', 'Save', css_class='btn-primary'))
+    def __init__(self, *args, **kwargs):
+        super(TodoForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+        self.helper.add_input(Submit('Save', 'Save', css_class='btn-primary'))
