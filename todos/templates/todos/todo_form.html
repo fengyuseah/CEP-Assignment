@@ -16,7 +16,9 @@ New
     {%else%}
         <h1>Create a New Todo</h1>
     {%endif%}
-    {% crispy form %}
+    {%if form%}
+        {% crispy form %}
+    {%endif%}
 	</div>
      </div>
 </div>
