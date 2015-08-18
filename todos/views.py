@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Todo
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView, TemplateView
@@ -39,9 +39,8 @@ class TodoList(ListView):
     
     def get_queryset(self):
         currentuser = UserProfile.objects.get(user=self.request.user)
-        todos = Todo.objects.filter(user=currentuser)
-        self.queryset = todos
-        return todos
+        self.queryset = Todo.objects.filter(user=currentuser)
+        return self.queryset
 
     def get_context_data(self, **kwargs):
         context = super(TodoList, self).get_context_data(**kwargs)
@@ -82,16 +81,17 @@ class TagList(ListView):
         context['currentuser'] = UserProfile.objects.get(user=self.request.user)
         return context
         
-class TodoCreate(CreateView):
+class TodoCreate(TemplateView):
     model = Todo
     todo_form_class = TodoForm
+    template_name = 'todos/todo_form.html'
     
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(TodoCreate, self).dispatch(*args, **kwargs)
         
     def get(self, request, *args, **kwargs):
-        kwargs.setdefault("createtodo_form", self.todo_form_class())
+        kwargs.setdefault("form", self.todo_form_class())
         kwargs.setdefault('currentuser', UserProfile.objects.get(user=self.request.user))
         return super(TodoCreate, self).get(request, *args, **kwargs)
         
@@ -99,12 +99,14 @@ class TodoCreate(CreateView):
         form_args = {
             'data': self.request.POST,
         }
-        form = self.todo_form_class(**form_args)
+        #form = self.todo_form_class(**form_args)
+        form = self.todo_form_class(request.POST)
         curruser = UserProfile.objects.get(user=self.request.user)
         obj = form.save(commit=False)
         obj.user = curruser #Save the note note under that user
         obj.save() #save the new object
-        return super(TodoCreate, self).get(request)
+        return redirect('/todos/')
+        #return super(TodoCreate, self).get(request)
     
 class TodoUpdate(UpdateView):
     model = Todo
